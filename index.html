@@ -324,7 +324,7 @@ const App = () => {
   };
 
   return (
-    React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-100 flex flex-col justify-center items-center p-4 sm:p-8 selection:bg-indigo-100 selection:text-indigo-700" },
+    React.createElement('div', { className: "fixed bottom-4 right-4 w-[calc(100%-2rem)] sm:w-full max-w-4xl" },
       React.createElement(Modal, {
         isOpen: isModalOpen,
         onClose: cancelCall,
@@ -342,12 +342,12 @@ const App = () => {
           )
         )
       ),
-      React.createElement('div', { className: "bg-white/70 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-7xl border border-gray-200" },
-        React.createElement('header', { className: "text-center mb-6 sm:mb-8" },
-          React.createElement('h1', { className: "text-3xl sm:text-4xl font-bold text-indigo-900" }, "すまえるフォン"),
-          React.createElement('p', { className: "text-sm text-slate-600 mt-2 sm:mt-3" }, "宛先を入力し、発信元を選択して通話を開始します。")
+      React.createElement('div', { className: "bg-gradient-to-br from-indigo-100 via-white to-cyan-100 p-6 rounded-2xl shadow-2xl w-full border border-gray-200 selection:bg-indigo-100 selection:text-indigo-700" },
+        React.createElement('header', { className: "text-center mb-6" },
+          React.createElement('h1', { className: "text-2xl sm:text-3xl font-bold text-indigo-900" }, "すまえるフォン"),
+          React.createElement('p', { className: "text-sm text-slate-600 mt-2" }, "宛先を入力し、発信元を選択して通話を開始します。")
         ),
-        React.createElement('div', { className: "md:flex md:items-start md:gap-6" },
+        React.createElement('div', { className: "flex items-end gap-4" },
             // Group 1: Destination
             React.createElement('div', { className: "flex-1" },
                 React.createElement(InputWithLabel, {
@@ -362,7 +362,7 @@ const App = () => {
                 })
             ),
             // Group 2: Source
-            React.createElement('div', { className: "flex-1 mt-6 md:mt-0" },
+            React.createElement('div', { className: "flex-1" },
                 React.createElement(SearchableSelect, {
                     id: "src",
                     label: "発信元（表示する番号）",
@@ -383,7 +383,7 @@ const App = () => {
                 )
             ),
             // Group 3: Button
-            React.createElement('div', { className: "mt-6 md:mt-0 flex-shrink-0" },
+            React.createElement('div', { className: "flex-shrink-0" },
                 React.createElement('p', { className: "text-right text-sm font-medium text-slate-700 mb-1.5" }, "すまえるフォン"),
                 React.createElement(CallButton, {
                     onClick: handleCallRequest,
@@ -398,11 +398,11 @@ const App = () => {
             )
         ),
         React.createElement('p', { id: "dest-description", className: "sr-only" }, "発信先の電話番号を入力してください。"),
-        React.createElement('p', { id: "src-description", className: "sr-only" }, "発信元として表示する電話番号を検索、選択、または入力してください。")
-      ),
-      React.createElement('footer', { className: "text-center text-xs text-slate-500 mt-8 w-full max-w-7xl px-2" },
-        React.createElement('p', { className: 'mb-2' }, "この情報は、デバイスの通話アプリに安全に送信されます。ウェブページには保存されません。"),
-        React.createElement('p', null, "© 2024 タマシステム")
+        React.createElement('p', { id: "src-description", className: "sr-only" }, "発信元として表示する電話番号を検索、選択、または入力してください。"),
+        React.createElement('footer', { className: "text-center text-xs text-slate-500 mt-6 pt-4 border-t border-slate-200" },
+            React.createElement('p', { className: 'mb-2' }, "この情報は、デバイスの通話アプリに安全に送信されます。ウェブページには保存されません。"),
+            React.createElement('p', null, "© 2024 タマシステム")
+        )
       )
     )
   );
