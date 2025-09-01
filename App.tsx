@@ -39,6 +39,18 @@ export const App = () => {
     const [phonebook, setPhonebook] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [installPrompt, setInstallPrompt] = useState(null);
+
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setInstallPrompt(e);
+        };
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        };
+    }, []);
 
     useEffect(() => {
         const fetchSheetData = async () => {
@@ -128,6 +140,20 @@ export const App = () => {
         setSrcDisplay(value);
     };
 
+    const handleInstallClick = async () => {
+      if (!installPrompt) {
+          return;
+      }
+      await installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      if (outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+      } else {
+          console.log('User dismissed the install prompt');
+      }
+      setInstallPrompt(null);
+  };
+
     return (
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-3xl">
@@ -203,9 +229,23 @@ export const App = () => {
             </div>
             <p id="dest-description" className="sr-only">発信先の電話番号を入力してください。</p>
             <p id="src-description" className="sr-only">発信元として表示する電話番号を検索、選択、または入力してください。</p>
-            <footer className="text-center text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200">
-              <p className='mb-1'>この情報は、デバイスの通話アプリに安全に送信されます。ウェブページには保存されません。</p>
-              <p>© 2025 タマシステム</p>
+            <footer className="flex items-center justify-between text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200">
+                <div className='text-left'>
+                    <p className='mb-1'>この情報は、デバイスの通話アプリに安全に送信されます。ウェブページには保存されません。</p>
+                    <p>© 2025 タマシステム</p>
+                </div>
+                {installPrompt && (
+                    <button
+                        onClick={handleInstallClick}
+                        className="flex items-center gap-2 ml-4 px-4 py-2 bg-slate-100 text-slate-800 font-semibold rounded-lg hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 ease-in-out"
+                        title="アプリをインストール"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                        <span>インストール</span>
+                    </button>
+                )}
             </footer>
           </div>
         </div>
