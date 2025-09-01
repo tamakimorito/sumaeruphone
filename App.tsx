@@ -40,6 +40,33 @@ export const App = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [installPrompt, setInstallPrompt] = useState(null);
+    const [showInstallButton, setShowInstallButton] = useState(true);
+
+    useEffect(() => {
+        const appInstalled = localStorage.getItem('appInstalled');
+        if (appInstalled) {
+            setShowInstallButton(false);
+        }
+
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setInstallPrompt(e);
+        };
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+        const handleAppInstalled = () => {
+            localStorage.setItem('appInstalled', 'true');
+            setShowInstallButton(false);
+        };
+        window.addEventListener('appinstalled', handleAppInstalled);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
+    }, []);
+
     useEffect(() => {
         const fetchSheetData = async () => {
         setIsLoading(true);
@@ -128,6 +155,14 @@ export const App = () => {
         setSrcDisplay(value);
     };
 
+    const handleInstallClick = async () => {
+        if (!installPrompt) return;
+        installPrompt.prompt();
+        localStorage.setItem('appInstalled', 'true');
+        setShowInstallButton(false);
+        setInstallPrompt(null);
+    };
+
     return (
       <div className="fixed bottom-4 right-4 w-[calc(100%-2rem)] sm:w-full max-w-3xl">
         <Modal
@@ -203,6 +238,21 @@ export const App = () => {
           <p id="dest-description" className="sr-only">発信先の電話番号を入力してください。</p>
           <p id="src-description" className="sr-only">発信元として表示する電話番号を検索、選択、または入力してください。</p>
           <footer className="text-center text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200">
+            {installPrompt && showInstallButton && (
+                <div className="mb-4">
+                    <button
+                        onClick={handleInstallClick}
+                        className="flex items-center justify-center gap-2 w-full max-w-xs mx-auto px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        aria-label="アプリをインストール"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" />
+                            <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+                        </svg>
+                        <span>ワンタッチでアプリをインストール</span>
+                    </button>
+                </div>
+            )}
             <p className='mb-1'>この情報は、デバイスの通話アプリに安全に送信されます。ウェブページには保存されません。</p>
             <p>© 2025 タマシステム</p>
           </footer>
