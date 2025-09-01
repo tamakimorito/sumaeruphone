@@ -1,9 +1,9 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { InputWithLabel } from './components/InputWithLabel';
-import { CallButton } from './components/CallButton';
-import { SearchableSelect } from './components/SearchableSelect';
-import { Modal } from './components/Modal';
+import { InputWithLabel } from './components/InputWithLabel.tsx';
+import { CallButton } from './components/CallButton.tsx';
+import { SearchableSelect } from './components/SearchableSelect.tsx';
+import { Modal } from './components/Modal.tsx';
 
 const parseCsv = (csvText) => {
     return csvText
@@ -150,7 +150,7 @@ export const App = () => {
           )}
         </Modal>
         <div className="bg-gradient-to-br from-indigo-100 via-white to-cyan-100 p-4 rounded-2xl shadow-2xl w-full border border-gray-200 selection:bg-indigo-100 selection:text-indigo-700">
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-4">
             <div className="flex-1">
               <InputWithLabel
                 id="dest"

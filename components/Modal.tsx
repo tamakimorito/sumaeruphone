@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CallButton } from './CallButton';
+import { CallButton } from './CallButton.tsx';
 
 export const Modal = ({ isOpen, onClose, onConfirm, title, children }) => {
   if (!isOpen) return null;
