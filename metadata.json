@@ -1,0 +1,6 @@
+{
+  "name": "すまえるフォン",
+  "description": "すまえるフォンで、かんたん通話。宛先と発信元番号を入力して、すぐに発信できます。",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
