@@ -4,7 +4,6 @@ import { InputWithLabel } from './components/InputWithLabel.tsx';
 import { CallButton } from './components/CallButton.tsx';
 import { SearchableSelect } from './components/SearchableSelect.tsx';
 import { Modal } from './components/Modal.tsx';
-import { InstallPrompt } from './components/InstallPrompt.tsx';
 
 const parseCsv = (csvText) => {
     return csvText
@@ -132,7 +131,6 @@ export const App = () => {
     return (
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-3xl">
-          <InstallPrompt />
           <Modal
             isOpen={isModalOpen}
             onClose={cancelCall}
