@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CallButton } from './CallButton.tsx';
 
@@ -11,7 +10,7 @@ export const Modal = ({ isOpen, onClose, onConfirm, title, children }) => {
       onClick={onClose}
     >
       <div 
-        className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 sm:p-8 transform transition-all duration-300 ease-in-out scale-95 opacity-0 animate-fade-in-scale"
+        className="relative bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 sm:p-8 transform transition-all duration-300 ease-in-out scale-95 opacity-0 animate-fade-in-scale"
         onClick={e => e.stopPropagation()}
       >
         <h3 className="text-xl font-bold text-slate-800 text-center">{title}</h3>
