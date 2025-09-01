@@ -41,23 +41,26 @@ export const App = () => {
     const [error, setError] = useState(null);
 
     const [installPrompt, setInstallPrompt] = useState(null);
-    const [showInstallButton, setShowInstallButton] = useState(true);
+    const [showInstallButton, setShowInstallButton] = useState(false);
 
     useEffect(() => {
-        const appInstalled = localStorage.getItem('appInstalled');
-        if (appInstalled) {
-            setShowInstallButton(false);
+        const buttonClicked = localStorage.getItem('installButtonClicked');
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+        if (buttonClicked || isStandalone) {
+            return;
         }
 
         const handleBeforeInstallPrompt = (e) => {
             e.preventDefault();
             setInstallPrompt(e);
+            setShowInstallButton(true);
         };
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
         const handleAppInstalled = () => {
-            localStorage.setItem('appInstalled', 'true');
             setShowInstallButton(false);
+            setInstallPrompt(null);
         };
         window.addEventListener('appinstalled', handleAppInstalled);
 
@@ -157,9 +160,14 @@ export const App = () => {
 
     const handleInstallClick = async () => {
         if (!installPrompt) return;
-        installPrompt.prompt();
-        localStorage.setItem('appInstalled', 'true');
+
         setShowInstallButton(false);
+        localStorage.setItem('installButtonClicked', 'true');
+        
+        installPrompt.prompt();
+        const { outcome } = await installPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        
         setInstallPrompt(null);
     };
 
@@ -238,7 +246,7 @@ export const App = () => {
           <p id="dest-description" className="sr-only">発信先の電話番号を入力してください。</p>
           <p id="src-description" className="sr-only">発信元として表示する電話番号を検索、選択、または入力してください。</p>
           <footer className="text-center text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200">
-            {installPrompt && showInstallButton && (
+            {showInstallButton && installPrompt && (
                 <div className="mb-4">
                     <button
                         onClick={handleInstallClick}
