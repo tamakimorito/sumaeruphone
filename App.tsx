@@ -204,7 +204,6 @@ export const App = () => {
             <p id="src-description" className="sr-only">発信元として表示する電話番号を検索、選択、または入力してください。</p>
             <footer className="flex items-center justify-between text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200">
                 <div className='text-left'>
-                    <p className='mb-1'>この情報は、デバイスの通話アプリに安全に送信されます。ウェブページには保存されません。</p>
                     <p>© 2025 タマシステム</p>
                 </div>
             </footer>
