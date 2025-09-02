@@ -5,6 +5,16 @@ import { CallButton } from './components/CallButton.tsx';
 import { SearchableSelect } from './components/SearchableSelect.tsx';
 import { Modal } from './components/Modal.tsx';
 
+// `beforeinstallprompt` イベントの型定義
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: Array<string>;
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed',
+    platform: string,
+  }>;
+  prompt(): Promise<void>;
+}
+
 const parseCsv = (csvText) => {
     return csvText
     .trim()
@@ -39,6 +49,55 @@ export const App = () => {
     const [phonebook, setPhonebook] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+    const [isAppInstalled, setIsAppInstalled] = useState(false);
+
+    useEffect(() => {
+      const handleBeforeInstallPrompt = (e: Event) => {
+        e.preventDefault();
+        if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+          setIsAppInstalled(true);
+          return;
+        }
+        setDeferredPrompt(e as BeforeInstallPromptEvent);
+      };
+
+      const handleAppInstalled = () => {
+        console.log('PWA installed');
+        setDeferredPrompt(null);
+        setIsAppInstalled(true);
+      };
+
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.addEventListener('appinstalled', handleAppInstalled);
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+
+      if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+        setIsAppInstalled(true);
+      }
+
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.removeEventListener('appinstalled', handleAppInstalled);
+      };
+    }, []);
+
+    const handleInstallClick = async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      setDeferredPrompt(null);
+    };
 
     useEffect(() => {
         const fetchSheetData = async () => {
@@ -150,7 +209,20 @@ export const App = () => {
               </div>
             )}
           </Modal>
-          <div className="bg-gradient-to-br from-indigo-100 via-white to-cyan-100 p-4 rounded-2xl shadow-2xl w-full border border-gray-200 selection:bg-indigo-100 selection:text-indigo-700">
+          <div className="relative bg-gradient-to-br from-indigo-100 via-white to-cyan-100 p-4 rounded-2xl shadow-2xl w-full border border-gray-200 selection:bg-indigo-100 selection:text-indigo-700">
+            {deferredPrompt && !isAppInstalled && (
+              <button
+                id="installBtn"
+                onClick={handleInstallClick}
+                className="absolute top-3 right-3 flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-1.5 px-3 rounded-lg text-sm transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 z-10"
+                title="アプリをインストール"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+                インストール
+              </button>
+            )}
             <div className="flex items-start gap-4">
               <div className="flex-1">
                 <InputWithLabel
