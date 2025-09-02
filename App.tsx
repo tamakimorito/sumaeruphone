@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { InputWithLabel } from './components/InputWithLabel.tsx';
 import { CallButton } from './components/CallButton.tsx';
@@ -112,6 +113,7 @@ export const App = () => {
         
         setIsModalOpen(false);
         setCallInfo(null);
+        setDest(''); // 発信後に宛先をクリア
     }, [callInfo]);
 
     const cancelCall = () => {
