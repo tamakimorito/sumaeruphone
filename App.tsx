@@ -54,48 +54,51 @@ export const App = () => {
     const [isAppInstalled, setIsAppInstalled] = useState(false);
 
     useEffect(() => {
-      const handleBeforeInstallPrompt = (e: Event) => {
-        e.preventDefault();
+        const handleBeforeInstallPrompt = (e: Event) => {
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            setDeferredPrompt(e as BeforeInstallPromptEvent);
+        };
+
+        const handleAppInstalled = () => {
+            console.log('PWA installed');
+            // Clear the deferredPrompt so it can be garbage collected
+            setDeferredPrompt(null);
+            // Hide the install button
+            setIsAppInstalled(true);
+        };
+
+        // Check if the app is already installed.
         if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
-          setIsAppInstalled(true);
-          return;
+            setIsAppInstalled(true);
+        } else {
+            window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
         }
-        setDeferredPrompt(e as BeforeInstallPromptEvent);
-      };
+        
+        window.addEventListener('appinstalled', handleAppInstalled);
 
-      const handleAppInstalled = () => {
-        console.log('PWA installed');
-        setDeferredPrompt(null);
-        setIsAppInstalled(true);
-      };
+        // Register the service worker immediately for faster PWA detection.
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').then(registration => {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }).catch(err => {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        }
 
-      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.addEventListener('appinstalled', handleAppInstalled);
-
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(registration => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          }, err => {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-        });
-      }
-
-      if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
-        setIsAppInstalled(true);
-      }
-
-      return () => {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.removeEventListener('appinstalled', handleAppInstalled);
-      };
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
     }, []);
 
     const handleInstallClick = async () => {
       if (!deferredPrompt) return;
+      // Show the install prompt.
       deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt.
       await deferredPrompt.userChoice;
+      // We've used the prompt, and can't use it again, throw it away.
       setDeferredPrompt(null);
     };
 
